@@ -5,6 +5,11 @@ on:
     types:
       - published
   workflow_dispatch:
+    inputs:
+      major_version:
+        description: Major version to use for the NuGet package, for example 1 or 2
+        required: false
+        type: string
 
 jobs:
   publish:
@@ -24,8 +29,23 @@ jobs:
 
       - name: Pack
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
+          RAW_MAJOR_VERSION="${RAW_MAJOR_VERSION:-$(sed -n 's/.*<VersionPrefix>\([0-9]\+\)\..*/\1/p' src/Utilities.Common/Utilities.Common.csproj | head -n 1)}"
+
+          if [[ -z "${RAW_MAJOR_VERSION}" ]]; then
+            RAW_MAJOR_VERSION="1"
+          fi
+
+          if [[ "${RAW_MAJOR_VERSION}" =~ ^([0-9]+)$ ]]; then
+            MAJOR_VERSION="${BASH_REMATCH[1]}"
+          else
+            echo "Invalid major version: ${RAW_MAJOR_VERSION}"
+            exit 1
+          fi
+
+          VERSION="${MAJOR_VERSION}.0.${GITHUB_RUN_NUMBER}"
           dotnet pack src/Utilities.Common/Utilities.Common.csproj --configuration Release --no-restore --output artifacts/nuget /p:PackageVersion="$VERSION"
+        env:
+          RAW_MAJOR_VERSION: ${{ inputs.major_version }}
 
       - name: Push to NuGet
         run: dotnet nuget push "artifacts/nuget/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
