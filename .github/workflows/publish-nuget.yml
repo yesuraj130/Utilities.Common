@@ -47,5 +47,16 @@ jobs:
         env:
           RAW_MAJOR_VERSION: ${{ inputs.major_version }}
 
+      - name: Validate NuGet API key
+        run: |
+          if [[ -z "${NUGET_API_KEY}" ]]; then
+            echo "Missing NUGET_API_KEY secret. Add it in repository secrets before publishing."
+            exit 1
+          fi
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+
       - name: Push to NuGet
-        run: dotnet nuget push "artifacts/nuget/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push "artifacts/nuget/*.nupkg" --api-key "${NUGET_API_KEY}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
