@@ -3,6 +3,15 @@
     <TargetFramework>net48</TargetFramework>
     <AssemblyName>Utilities.Common</AssemblyName>
     <RootNamespace>Utilities.Common</RootNamespace>
+    <PackageId>Utilities.Common</PackageId>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <Authors>yesuraj130</Authors>
+    <Company>yesuraj130</Company>
+    <Description>Common utility helpers and extension methods for .NET Framework applications.</Description>
+    <PackageTags>utilities;extensions;helpers;net48</PackageTags>
+    <RepositoryUrl>https://github.com/yesuraj130/Utilities.Common</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <LangVersion>latest</LangVersion>

@@ -1,0 +1,31 @@
+name: Publish NuGet
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore src/Utilities.Common/Utilities.Common.csproj
+
+      - name: Pack
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          dotnet pack src/Utilities.Common/Utilities.Common.csproj --configuration Release --no-restore --output artifacts/nuget /p:PackageVersion="$VERSION"
+
+      - name: Push to NuGet
+        run: dotnet nuget push "artifacts/nuget/*.nupkg" --api-key "${{ secrets.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
